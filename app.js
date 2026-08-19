@@ -51,4 +51,11 @@
     markRead:function(id){ var r=this.getRead(); if(r.indexOf(id)<0){ r.push(id); this.setRead(r);} },
     isRead:function(id){ return this.getRead().indexOf(id)>=0; }
   };
+
+  /* service worker для офлайн-доступа (PWA/Android-обёртка) */
+  if('serviceWorker' in navigator){
+    window.addEventListener('load',function(){
+      navigator.serviceWorker.register('sw.js').catch(function(){});
+    });
+  }
 })();

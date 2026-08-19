@@ -1,0 +1,31 @@
+{
+  "name": "Падшие ангелы — история нашей Вселенной",
+  "short_name": "Падшие ангелы",
+  "description": "Эзотерико-мифологическая история нашей Вселенной: Великий переход, Первостроители, звёздные войны, хроники Аненербе и тайна кибер-системы.",
+  "start_url": "./index.html",
+  "id": "/FallenAngels/",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0d0f17",
+  "theme_color": "#0d0f17",
+  "lang": "ru",
+  "dir": "ltr",
+  "categories": ["books", "education", "lifestyle"],
+  "icons": [
+    { "src": "icon-48.png", "sizes": "48x48", "type": "image/png", "purpose": "any" },
+    { "src": "icon-72.png", "sizes": "72x72", "type": "image/png", "purpose": "any" },
+    { "src": "icon-96.png", "sizes": "96x96", "type": "image/png", "purpose": "any" },
+    { "src": "icon-144.png", "sizes": "144x144", "type": "image/png", "purpose": "any" },
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-384.png", "sizes": "384x384", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "screenshots": [
+    { "src": "screenshot-1.png", "sizes": "1080x2220", "type": "image/png", "form_factor": "narrow" },
+    { "src": "screenshot-2.png", "sizes": "1080x2220", "type": "image/png", "form_factor": "narrow" },
+    { "src": "screenshot-3.png", "sizes": "1080x2220", "type": "image/png", "form_factor": "narrow" },
+    { "src": "screenshot-4.png", "sizes": "1080x2220", "type": "image/png", "form_factor": "narrow" }
+  ]
+}
