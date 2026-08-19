@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://vysockiymark01-prog.github.io/FallenAngels/sitemap.xml

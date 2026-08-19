@@ -17,7 +17,7 @@
 <meta property="og:image" content="https://vysockiymark01-prog.github.io/FallenAngels/og.png">
 <meta name="twitter:card" content="summary_large_image">
 </head>
-<body>
+<body class="reading">
 <div class="progress" id="progress"></div>
 
 <div class="topbar">
@@ -28,6 +28,7 @@
     <a href="read.html">Читать</a>
     <a href="map.html">Карта Вселенной</a>
     <a href="timeline.html">Хронология</a>
+    <a href="compare.html">Три версии</a>
     <a href="who.html">Кто есть кто</a>
     <a href="glossary.html">Словарь</a>
     <a href="search.html">Поиск</a>
@@ -36,6 +37,7 @@
   <button class="btn" id="fsMinus" title="Уменьшить шрифт">A−</button>
   <button class="btn" id="fsPlus" title="Увеличить шрифт">A+</button>
   <button class="btn" id="themeBtn" title="Сменить тему">🌙</button>
+  <button class="btn" id="bmBtn" title="Закладки">🔖</button>
 </div>
 
 <div class="layout" id="top">
@@ -505,6 +507,20 @@
 
 <button class="totop" id="totop" title="Наверх">↑</button>
 
+<div class="mobile-bar" id="mbar">
+  <button id="mbToc" title="Оглавление">☰</button>
+  <div class="mb-title" id="mbTitle">Падшие ангелы</div>
+  <button id="mbPrev" title="Предыдущая глава">←</button>
+  <button id="mbNext" title="Следующая глава">→</button>
+</div>
+
+<aside class="bm-panel" id="bmPanel">
+  <button class="btn" style="position:absolute;top:12px;right:12px" id="bmClose">✕</button>
+  <h3>Закладки</h3>
+  <div id="bmList"></div>
+  <p class="bm-empty">Выделите любой фрагмент текста — появится кнопка «Закладка». Закладки хранятся в этом браузере.</p>
+</aside>
+
 <footer class="site">
   <div class="flinks">
     <a href="index.html">Главная</a><a href="map.html">Карта Вселенной</a><a href="who.html">Кто есть кто</a><a href="glossary.html">Словарь</a><a href="search.html">Поиск</a><a href="about.html">О проекте</a>
@@ -596,6 +612,203 @@
     });
     if(changed) paintRead();
   },2500);
+})();
+</script>
+<script>
+/* Термины-подсказки, клавиатурная навигация, закладки, мобильная панель */
+(function(){
+  var main=document.querySelector('main');
+  var toc=document.getElementById('toc');
+  var links=[].slice.call(toc.querySelectorAll('a'));
+  var sections=links.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  var titles=links.map(function(a){ return a.textContent; });
+
+  /* ---------- термины ---------- */
+  var TERMS=[
+    {re:'Паа[  ]Тал|Первостроител[а-яё]+',t:'Первостроители (Паа Тал)',d:'Развитые существа прежней Вселенной, добровольно последовавшие за падшими и сформировавшие структуру нашего Мироздания.'},
+    {re:'уклонист[а-яё]+',t:'Уклонисты',d:'Часть человечества 11-мерности, отказавшаяся от Великого перехода, — «падшие ангелы», прародители нашей Вселенной.'},
+    {re:'Пи-систем[а-яё]+',t:'Пи-система',d:'Принцип строения нашей Вселенной с кодом размерности, близким к числу пи; её знак — число 5, полное число Мироздания — 12.'},
+    {re:'чёрн[а-яё]+[  ]слиз[а-яё]+|чёрн[а-яё]+[  ]субстанци[а-яё]+|black[  ]goo',t:'Чёрная субстанция',d:'Живая наносубстанция — носитель всепроникающего принципа жизни, «кровь Вселенной». У драконианцев — свой агрессивный вариант.'},
+    {re:'сенс-энерги[а-яё]+',t:'Сенс-энергия',d:'Энергоинформационная структура универсального разума — «душа», которую кибер-система научилась захватывать и делить.'},
+    {re:'тахионн[а-яё]+[  ]простран[а-яё]+',t:'Тахионное пространство',d:'«Пространство света» за световым барьером, где энергия — форма материи; там находится кибер-система.'},
+    {re:'кибер-систем[а-яё]+',t:'Кибер-система',d:'Паразитарный ИИ: робот-захватчик душ и супермозг. Управляет «переселением душ» и навязал землянам дискретное мышление.'},
+    {re:'супермозг[а-яё]*',t:'Супермозг',d:'Многомерное хранилище кибер-системы, состоящее из захваченных душ; питается дискретной информацией от робота.'},
+    {re:'армагеддон[а-яё]*',t:'Армагеддон',d:'Глобальный катаклизм при проходе железной планеты (раз в 3600 лет): смещение полюсов, потопы, ледниковые периоды.'},
+    {re:'аннунак[а-яё]+',t:'Аннунаки',d:'Боги железной планеты (Ану, Энки, Энлиль), прибывшие 450 тыс. лет до н.э. за золотом и создавшие царства Эриду и Мицар.'},
+    {re:'виман[а-яё]+',t:'Вимана',d:'Летательный аппарат богов и атлантов; виманы атлантов нанесли удар по Агарти, погубивший Атлантиду.'},
+    {re:'Агарт[а-яё]+',t:'Агарти',d:'«Несокрушимая священная страна» внутри полой Земли — колыбель человечества, где была создана Первая раса.'},
+    {re:'лирианц[а-яё]+',t:'Лирианцы',d:'Первая человеческая цивилизация новой Вселенной (созвездие Лиры, Вега) — истинные предки землян.'},
+    {re:'драконианц[а-яё]+|драко-рептили[а-яё]+',t:'Драконианцы',d:'Раса-захватчик из иного мироздания с кастовой иерархией Сиккар; центр — Альфа Драконис.'},
+    {re:'тераид[а-яё]+',t:'Тераиды',d:'Стабильные трансурановые металлы — продукт взрыва сверхновой, «топливо» возрождённого Солнца и молодых планет.'},
+    {re:'золот[а-яё]+[  ]сечени[а-яё]+',t:'Золотое сечение',d:'Главный закон нашего пространства-времени: Земля, Солнечная система и Галактика лежат в точках деления по золотому сечению.'},
+    {re:'бактун[а-яё]*',t:'Бактун',d:'Единица календаря майя: 14 400 дней. Календарь начинается с третьего армагеддона и заканчивается 27.12.2012.'},
+    {re:'биоробот[а-яё]+',t:'Биороботы',d:'«Модули» кибер-системы в нашем пространстве; скрещивались с людьми, оставив параспособности и каналы подключения.'}
+  ];
+  var combo=new RegExp(TERMS.map(function(x){return '('+x.re+')';}).join('|'),'gi');
+
+  sections.forEach(function(s){
+    if(!s) return;
+    var counts={};
+    var walker=document.createTreeWalker(s,NodeFilter.SHOW_TEXT,{acceptNode:function(n){
+      var p=n.parentNode.nodeName;
+      if(p==='A'||p==='MARK'||p==='SCRIPT'||p==='H3'||n.parentNode.classList.contains('term')) return NodeFilter.FILTER_REJECT;
+      return NodeFilter.FILTER_ACCEPT;
+    }});
+    var nodes=[]; while(walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach(function(node){
+      var text=node.nodeValue;
+      combo.lastIndex=0;
+      if(!combo.test(text)) return;
+      combo.lastIndex=0;
+      var frag=document.createDocumentFragment(), last=0, m, made=false;
+      while((m=combo.exec(text))!==null){
+        var ti=-1;
+        for(var i=0;i<TERMS.length;i++){ if(m[i+1]!==undefined){ ti=i; break; } }
+        if(ti<0) continue;
+        var prev=m.index>0?text[m.index-1]:' ';
+        if(/[а-яёa-z-]/i.test(prev)) continue;
+        counts[ti]=(counts[ti]||0)+1;
+        if(counts[ti]>2) continue;
+        frag.appendChild(document.createTextNode(text.slice(last,m.index)));
+        var sp=document.createElement('span');
+        sp.className='term'; sp.textContent=m[0]; sp.dataset.t=ti;
+        frag.appendChild(sp);
+        last=m.index+m[0].length; made=true;
+      }
+      if(!made) return;
+      frag.appendChild(document.createTextNode(text.slice(last)));
+      node.parentNode.replaceChild(frag,node);
+    });
+  });
+
+  var pop=null, popY=0;
+  function closePop(){ if(pop){ pop.remove(); pop=null; } }
+  document.addEventListener('click',function(e){
+    var t=e.target.closest('.term');
+    if(!t){ if(!e.target.closest('.term-pop')) closePop(); return; }
+    closePop();
+    var info=TERMS[+t.dataset.t];
+    pop=document.createElement('div');
+    pop.className='term-pop';
+    pop.innerHTML='<b>'+info.t+'</b>'+info.d+' <a href="glossary.html">Словарь →</a>';
+    document.body.appendChild(pop);
+    var r=t.getBoundingClientRect();
+    var x=Math.min(Math.max(10,r.left+window.scrollX-20),document.documentElement.clientWidth-330);
+    pop.style.left=x+'px';
+    pop.style.top=(r.bottom+window.scrollY+8)+'px';
+    popY=window.scrollY;
+  });
+  window.addEventListener('scroll',function(){
+    if(pop && Math.abs(window.scrollY-popY)>80) closePop();
+  },{passive:true});
+
+  /* ---------- текущая глава ---------- */
+  function curIdx(){
+    var y=window.scrollY+120, cur=0;
+    for(var i=0;i<sections.length;i++){ if(sections[i]&&sections[i].offsetTop<=y) cur=i; }
+    return cur;
+  }
+  function goChapter(i){
+    if(i<0||i>=sections.length||!sections[i]) return;
+    window.scrollTo({top:sections[i].offsetTop-64,behavior:'smooth'});
+  }
+
+  /* ---------- клавиатурная навигация ---------- */
+  document.addEventListener('keydown',function(e){
+    if(e.altKey||e.ctrlKey||e.metaKey) return;
+    var tag=(e.target.tagName||'').toLowerCase();
+    if(tag==='input'||tag==='textarea'||e.target.isContentEditable) return;
+    if(e.key==='ArrowRight'){ goChapter(curIdx()+1); e.preventDefault(); }
+    if(e.key==='ArrowLeft'){ goChapter(curIdx()-1); e.preventDefault(); }
+  });
+
+  /* ---------- мобильная панель ---------- */
+  var mbTitle=document.getElementById('mbTitle');
+  document.getElementById('mbToc').onclick=function(){ document.getElementById('toc').classList.add('open'); };
+  document.getElementById('mbPrev').onclick=function(){ goChapter(curIdx()-1); };
+  document.getElementById('mbNext').onclick=function(){ goChapter(curIdx()+1); };
+  function updBar(){ mbTitle.textContent=titles[curIdx()]||'Падшие ангелы'; }
+  window.addEventListener('scroll',updBar,{passive:true});
+  updBar();
+
+  /* ---------- закладки ---------- */
+  function getBM(){ try{ return JSON.parse(localStorage.getItem('fa_bm')||'[]'); }catch(e){ return []; } }
+  function setBM(a){ try{ localStorage.setItem('fa_bm',JSON.stringify(a)); }catch(e){} }
+  var panel=document.getElementById('bmPanel'), list=document.getElementById('bmList');
+  document.getElementById('bmBtn').onclick=function(){ render(); panel.classList.add('open'); };
+  document.getElementById('bmClose').onclick=function(){ panel.classList.remove('open'); };
+
+  function render(){
+    var bms=getBM();
+    if(!bms.length){ list.innerHTML=''; return; }
+    list.innerHTML=bms.slice().reverse().map(function(b,ri){
+      var i=bms.length-1-ri;
+      return '<div class="bm-item" data-i="'+i+'">'+
+        '<div class="bm-ch">'+(b.ch||'')+'</div>'+
+        '<div class="bm-snip">«'+b.sn.replace(/</g,'&lt;')+'»</div>'+
+        (b.n?'<div class="bm-note">✎ '+b.n.replace(/</g,'&lt;')+'</div>':'')+
+        '<div class="bm-actions">'+
+        '<button data-act="go">Перейти</button>'+
+        '<button data-act="note">Заметка</button>'+
+        '<button data-act="del">Удалить</button>'+
+        '</div><div class="bm-editor"></div></div>';
+    }).join('');
+  }
+  list.addEventListener('click',function(e){
+    var btn=e.target.closest('button[data-act]'); if(!btn) return;
+    var item=btn.closest('.bm-item'), i=+item.dataset.i, bms=getBM();
+    if(btn.dataset.act==='go'){
+      panel.classList.remove('open');
+      window.scrollTo({top:bms[i].y,behavior:'smooth'});
+    }else if(btn.dataset.act==='del'){
+      bms.splice(i,1); setBM(bms); render();
+    }else if(btn.dataset.act==='note'){
+      var ed=item.querySelector('.bm-editor');
+      if(ed.querySelector('input')) return;
+      ed.innerHTML='<input class="filterbox" style="margin:8px 0 0;padding:8px 12px;font-size:14px" placeholder="Текст заметки, Enter — сохранить" value="'+(bms[i].n||'').replace(/"/g,'&quot;')+'">';
+      var inp=ed.querySelector('input'); inp.focus();
+      function save(){ var b=getBM(); b[i].n=inp.value.trim(); setBM(b); render(); }
+      inp.addEventListener('keydown',function(ev){ if(ev.key==='Enter') save(); });
+      inp.addEventListener('blur',save);
+    }
+  });
+
+  /* кнопка при выделении текста */
+  var chip=null, chipY=0;
+  function removeChip(){ if(chip){ chip.remove(); chip=null; } }
+  function onSelEnd(e){
+    if(e&&e.target&&e.target.closest&&e.target.closest('.selchip')) return;
+    setTimeout(function(){
+      removeChip();
+      var sel=window.getSelection();
+      if(!sel||sel.isCollapsed) return;
+      var txt=sel.toString().trim();
+      if(txt.length<4||txt.length>1000) return;
+      var node=sel.anchorNode&&sel.anchorNode.parentNode;
+      if(!node||!main.contains(node)) return;
+      var r=sel.getRangeAt(0).getBoundingClientRect();
+      chip=document.createElement('button');
+      chip.className='selchip'; chip.textContent='🔖 Закладка';
+      document.body.appendChild(chip);
+      chip.style.left=Math.max(10,r.left+window.scrollX+r.width/2-55)+'px';
+      chip.style.top=(r.top+window.scrollY-42)+'px';
+      chipY=window.scrollY;
+      chip.onclick=function(){
+        var idx=curIdx();
+        var bms=getBM();
+        bms.push({sn:txt.slice(0,160),ch:titles[idx]||'',y:Math.round(r.top+window.scrollY-140),n:'',t:Date.now()});
+        setBM(bms);
+        chip.textContent='✓ Сохранено';
+        setTimeout(removeChip,900);
+        try{ sel.removeAllRanges(); }catch(e){}
+      };
+    },10);
+  }
+  document.addEventListener('mouseup',onSelEnd);
+  document.addEventListener('touchend',onSelEnd);
+  document.addEventListener('scroll',function(){
+    if(chip && Math.abs(window.scrollY-chipY)>80) removeChip();
+  },{passive:true});
 })();
 </script>
 </body>

@@ -160,6 +160,69 @@ mark{background:color-mix(in srgb,var(--accent) 45%,transparent);color:inherit;b
 .tl-item p{font-size:.9em;color:var(--muted);margin:0}
 .tl-item .tl-link{font-family:'Montserrat',sans-serif;font-size:12px}
 
+/* ---------- термины-подсказки ---------- */
+.term{border-bottom:1px dotted var(--accent);cursor:help}
+.term-pop{position:absolute;z-index:120;max-width:320px;background:var(--panel);border:1px solid var(--accent);border-radius:12px;padding:12px 16px;font-size:14.5px;line-height:1.5;box-shadow:0 10px 30px var(--shadow)}
+.term-pop b{font-family:'Montserrat',sans-serif;color:var(--accent2);display:block;margin-bottom:4px;font-size:13.5px}
+.term-pop a{font-family:'Montserrat',sans-serif;font-size:12px}
+
+/* ---------- закладки ---------- */
+.selchip{position:absolute;z-index:120;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#1b1405;border:none;border-radius:20px;padding:8px 14px;cursor:pointer;box-shadow:0 6px 18px var(--shadow)}
+.bm-panel{position:fixed;top:0;right:0;height:100vh;width:min(380px,92vw);background:var(--panel);border-left:1px solid var(--line);z-index:96;transform:translateX(105%);transition:transform .3s;padding:18px;overflow-y:auto;box-shadow:0 0 60px var(--shadow)}
+.bm-panel.open{transform:none}
+.bm-panel h3{font-family:'Montserrat',sans-serif;font-size:15px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin:4px 0 14px}
+.bm-item{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:12px;background:var(--bg2)}
+.bm-item .bm-ch{font-family:'Montserrat',sans-serif;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent2)}
+.bm-item .bm-snip{font-size:14px;font-style:italic;margin:6px 0;color:var(--text)}
+.bm-item .bm-note{font-size:13.5px;color:var(--muted);margin:6px 0}
+.bm-item .bm-actions{display:flex;gap:8px;margin-top:8px}
+.bm-item .bm-actions button{font-family:'Montserrat',sans-serif;font-size:12px;padding:5px 10px;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--text);cursor:pointer}
+.bm-item .bm-actions button:hover{border-color:var(--accent);color:var(--accent2)}
+.bm-empty{color:var(--muted);font-size:14px;font-style:italic}
+
+/* ---------- мобильная нижняя панель чтения ---------- */
+.mobile-bar{display:none;position:fixed;left:0;right:0;bottom:0;z-index:85;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);border-top:1px solid var(--line);padding:8px 10px calc(8px + env(safe-area-inset-bottom));grid-template-columns:auto 1fr auto auto;gap:8px;align-items:center}
+.mobile-bar button{font-family:'Montserrat',sans-serif;font-size:15px;font-weight:600;background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px 14px;cursor:pointer}
+.mobile-bar .mb-title{text-align:center;font-family:'Montserrat',sans-serif;font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 4px}
+
+/* ---------- сравнение версий ---------- */
+.cmp{width:100%;border-collapse:collapse;margin:18px 0 36px;font-size:.92em}
+.cmp th{font-family:'Montserrat',sans-serif;font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent2);background:var(--panel);border:1px solid var(--line);padding:10px 12px;text-align:left}
+.cmp td{border:1px solid var(--line);padding:10px 14px;vertical-align:top;background:color-mix(in srgb,var(--panel) 55%,transparent)}
+.cmp td:first-child{font-family:'Montserrat',sans-serif;font-size:13px;color:var(--muted);white-space:nowrap}
+@media(max-width:760px){
+  .cmp,.cmp thead,.cmp tbody,.cmp tr,.cmp th,.cmp td{display:block;white-space:normal}
+  .cmp thead{display:none}
+  .cmp tr{margin-bottom:16px;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .cmp td{border:none;border-bottom:1px solid var(--line)}
+  .cmp td:first-child{background:var(--panel);color:var(--accent2)}
+  .cmp td[data-col]::before{content:attr(data-col);display:block;font-family:'Montserrat',sans-serif;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+}
+
+/* ---------- скачивание книги ---------- */
+.dl-row{display:flex;gap:12px;flex-wrap:wrap;margin:16px 0}
+.dl-row a{font-family:'Montserrat',sans-serif;font-size:14px;font-weight:600;text-decoration:none;padding:12px 20px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--text)}
+.dl-row a:hover{border-color:var(--accent);color:var(--accent2)}
+.dl-row a b{color:var(--accent2)}
+
+/* ---------- печать ---------- */
+@media print{
+  .topbar,nav.toc,.totop,.progress,.mobile-bar,.bm-panel,.selchip,.term-pop,footer.site,header.site .cta{display:none !important}
+  body{background:#fff;color:#000;font-size:12pt;line-height:1.5}
+  .layout{display:block;padding:0;max-width:none}
+  header.site{background:none;padding:20px 0;color:#000}
+  header.site h1{color:#000}
+  header.site .sub,.part-divider .num{color:#444}
+  section.chapter h3,.part-divider h2{color:#000}
+  section.chapter .ch-num,.tl-date{color:#555}
+  .note,blockquote,.dialog{background:none;border-color:#999}
+  .lede::first-letter{color:#000}
+  a{color:#000;text-decoration:none}
+  .term{border-bottom:none}
+  section.chapter{page-break-inside:auto}
+  section.chapter h3{page-break-after:avoid}
+}
+
 /* ---------- misc ---------- */
 .totop{position:fixed;right:22px;bottom:22px;width:44px;height:44px;border-radius:50%;background:var(--panel);border:1px solid var(--line);color:var(--accent);font-size:20px;cursor:pointer;opacity:0;pointer-events:none;transition:.3s;z-index:80;box-shadow:0 4px 14px var(--shadow)}
 .totop.show{opacity:1;pointer-events:auto}
@@ -177,4 +240,28 @@ footer.site .flinks{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;
   .map-wrap{grid-template-columns:1fr}
   .map-info{position:static}
   .topbar .brand{display:none}
+  .topnav a{padding:9px 12px;font-size:13.5px}
+  .btn{padding:9px 13px}
+  section.chapter p{text-align:left}
+  .lede::first-letter{font-size:2.4em}
+  body.reading{padding-bottom:70px}
+  body.reading .mobile-bar{display:grid}
+  body.reading .totop{bottom:78px}
+  .page{padding:28px 16px 60px}
+  .dl-row a{flex:1;text-align:center}
+  /* на узком экране выключка по ширине рвёт строки — выравниваем по левому краю */
+  section.chapter p{text-align:left;hyphens:auto}
+  section.chapter{margin-bottom:42px}
+  .lede::first-letter{font-size:2.6em;padding:4px 8px 0 0}
+  header.site{padding:56px 18px 44px}
+  header.site .cta{flex-direction:column;align-items:stretch}
+  header.site .cta a{width:100%;text-align:center}
+  .path{grid-template-columns:1fr}
+  .term-pop{max-width:calc(100vw - 24px)}
+  .selchip{padding:11px 18px;font-size:14px}
+  nav.toc a{padding-top:9px;padding-bottom:9px}
+  .chlist a{padding:13px 6px}
+  .alpha-nav a,.map-node{padding:10px 14px}
+  .searchbox{flex-direction:column}
+  .searchbox .btn{width:100%}
 }
