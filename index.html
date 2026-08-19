@@ -143,7 +143,8 @@
     var num=+last.replace('gl-','');
     if(num>1){
       var cb=document.getElementById('continueBtn');
-      cb.href='read.html#'+last;
+      /* без якоря: страница чтения сама вернёт на точное место */
+      cb.href='read.html';
       cb.textContent='Продолжить чтение — глава '+num;
       cb.style.display='';
       var sb=document.getElementById('startBtn');

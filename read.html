@@ -538,7 +538,7 @@
   paintRead();
 
   /* подсветка текущей главы + запоминание позиции для «Продолжить чтение» */
-  var lastSaved=null;
+  var lastSaved=null, lastScrollSave=0, restored=false;
   function highlight(){
     var y=window.scrollY+120, cur=-1;
     for(var i=0;i<sections.length;i++){ if(sections[i]&&sections[i].offsetTop<=y) cur=i; }
@@ -547,9 +547,39 @@
       lastSaved=sections[cur].id;
       try{ localStorage.setItem('fa_last',lastSaved); }catch(e){}
     }
+    /* точная позиция прокрутки (не чаще раза в полсекунды) */
+    if(restored && Date.now()-lastScrollSave>500){
+      lastScrollSave=Date.now();
+      try{ localStorage.setItem('fa_scroll',String(Math.round(window.scrollY))); }catch(e){}
+    }
   }
   window.addEventListener('scroll',highlight,{passive:true});
-  highlight();
+  document.addEventListener('visibilitychange',function(){
+    if(document.visibilityState==='hidden' && restored){
+      try{ localStorage.setItem('fa_scroll',String(Math.round(window.scrollY))); }catch(e){}
+    }
+  });
+
+  /* восстановление места чтения: если страница открыта без якоря,
+     возвращаемся туда, где остановились в прошлый раз */
+  (function restore(){
+    if(location.hash){ restored=true; highlight(); return; }
+    var sy=NaN, last=null;
+    try{ sy=parseInt(localStorage.getItem('fa_scroll'),10); last=localStorage.getItem('fa_last'); }catch(e){}
+    function go(y){ window.scrollTo({top:y,left:0,behavior:'instant'}); }
+    if(!isNaN(sy) && sy>200){
+      go(sy);
+      /* повторяем после загрузки шрифтов, чтобы позиция не «уплыла» */
+      setTimeout(function(){ go(sy); restored=true; highlight(); },400);
+      setTimeout(function(){ if(Math.abs(window.scrollY-sy)>50 && Date.now()-lastScrollSave>900) go(sy); },1200);
+    }else if(last && document.getElementById(last)){
+      go(document.getElementById(last).offsetTop-70);
+      setTimeout(function(){ restored=true; highlight(); },400);
+    }else{
+      restored=true;
+    }
+    highlight();
+  })();
 
   /* автоотметка прочитанных: конец главы должен задержаться на экране,
      чтобы прокрутка-перелёт по якорю ничего не помечала */
