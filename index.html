@@ -61,12 +61,13 @@ ul.plain li{margin:7px 0}
 footer.site{border-top:1px solid var(--line);padding:36px 20px;text-align:center;color:var(--muted);font-size:14px}
 footer.site a{color:var(--accent)}
 .menu-btn{display:none}
+.toc-close{display:none}
 @media(max-width:900px){
   .layout{display:block;padding:24px 16px 60px}
   nav.toc{position:fixed;top:0;left:0;height:100vh;max-height:100vh;width:min(320px,85vw);border-radius:0;transform:translateX(-105%);transition:transform .3s;z-index:95;padding-top:60px}
   nav.toc.open{transform:none;box-shadow:0 0 60px var(--shadow)}
   .menu-btn{display:inline-block}
-  .toc-close{position:absolute;top:12px;right:12px}
+  .toc-close{display:inline-block;position:absolute;top:12px;right:12px}
 }
 </style>
 </head>
