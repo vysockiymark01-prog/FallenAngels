@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Поиск — Падшие ангелы</title>
+<meta name="description" content="Полнотекстовый поиск по всем 33 главам «Падших ангелов».">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="topbar">
+  <a class="brand" href="index.html">Падшие ангелы</a>
+  <nav class="topnav">
+    <a href="index.html">Главная</a>
+    <a href="read.html">Читать</a>
+    <a href="map.html">Карта Вселенной</a>
+    <a href="who.html">Кто есть кто</a>
+    <a href="glossary.html">Словарь</a>
+    <a href="search.html">Поиск</a>
+    <a href="about.html">О проекте</a>
+  </nav>
+  <button class="btn" id="fsMinus" title="Уменьшить шрифт">A−</button>
+  <button class="btn" id="fsPlus" title="Увеличить шрифт">A+</button>
+  <button class="btn" id="themeBtn" title="Сменить тему">🌙</button>
+</div>
+
+<div class="page">
+  <h2 class="pagetitle">Поиск по тексту</h2>
+  <p class="pagesub">Ищет по всем 33 главам обеих частей. Введите слово или фразу — например, «золотое сечение», «Икар», «карма».</p>
+  <div class="searchbox">
+    <input id="q" type="search" placeholder="Что ищем?" autofocus>
+    <button class="btn" id="go" style="padding:12px 20px;font-size:14px">Найти</button>
+  </div>
+  <div class="search-meta" id="meta">Загружаю текст глав…</div>
+  <div id="results"></div>
+</div>
+
+<footer class="site">
+  <div class="flinks">
+    <a href="index.html">Главная</a><a href="read.html">Читать</a><a href="map.html">Карта Вселенной</a><a href="who.html">Кто есть кто</a><a href="glossary.html">Словарь</a><a href="about.html">О проекте</a>
+  </div>
+  <p>Материал носит эзотерико-мифологический характер и публикуется в ознакомительных целях.</p>
+</footer>
+
+<script src="app.js"></script>
+<script>
+(function(){
+  var meta=document.getElementById('meta'), results=document.getElementById('results');
+  var q=document.getElementById('q'), go=document.getElementById('go');
+  var chapters=null;
+
+  fetch('read.html').then(function(r){return r.text();}).then(function(html){
+    var doc=new DOMParser().parseFromString(html,'text/html');
+    chapters=[].slice.call(doc.querySelectorAll('section.chapter')).map(function(s){
+      return {
+        id:s.id,
+        num:s.id.replace('gl-',''),
+        title:s.querySelector('h3').textContent,
+        paras:[].slice.call(s.querySelectorAll('p')).map(function(p){return p.textContent;})
+      };
+    });
+    meta.textContent='Готово к поиску: '+chapters.length+' глав.';
+    var urlq=new URLSearchParams(location.search).get('q');
+    if(urlq){ q.value=urlq; run(); }
+  }).catch(function(){ meta.textContent='Не удалось загрузить текст. Обновите страницу.'; });
+
+  function esc(s){ return s.replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+  function escRe(s){ return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
+
+  function run(){
+    if(!chapters) return;
+    var term=q.value.trim();
+    results.innerHTML='';
+    if(term.length<2){ meta.textContent='Введите хотя бы два символа.'; return; }
+    var re=new RegExp(escRe(term),'gi');
+    var total=0, chHits=0, html='';
+    chapters.forEach(function(ch){
+      var snips=[], count=0;
+      ch.paras.forEach(function(p){
+        var m=p.match(re);
+        if(m){
+          count+=m.length;
+          if(snips.length<3){
+            var idx=p.search(re);
+            var start=Math.max(0,idx-90), end=Math.min(p.length,idx+term.length+150);
+            var snippet=(start>0?'…':'')+p.slice(start,end)+(end<p.length?'…':'');
+            snips.push(esc(snippet).replace(new RegExp(escRe(esc(term)),'gi'),function(x){return '<mark>'+x+'</mark>';}));
+          }
+        }
+      });
+      if(count>0){
+        chHits++; total+=count;
+        html+='<div class="hit"><h4><a href="read.html#'+ch.id+'">Глава '+ch.num+'. '+esc(ch.title)+'</a></h4>'+
+          snips.map(function(s){return '<p class="snip">'+s+'</p>';}).join('')+
+          '<div class="more">Совпадений в главе: '+count+'</div></div>';
+      }
+    });
+    meta.textContent=total?('Найдено '+total+' совпадений в '+chHits+' главах.'):'Ничего не найдено. Попробуйте другое слово или его часть.';
+    results.innerHTML=html;
+  }
+
+  go.onclick=run;
+  q.addEventListener('keydown',function(e){ if(e.key==='Enter') run(); });
+  q.addEventListener('input',function(){ if(q.value.trim().length>=3) run(); });
+})();
+</script>
+</body>
+</html>
