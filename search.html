@@ -9,6 +9,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta property="og:site_name" content="Падшие ангелы">
+<meta property="og:title" content="Падшие ангелы — история нашей Вселенной">
+<meta property="og:description" content="Великий переход, Первостроители, звёздные войны, хроники Аненербе и тайна кибер-системы. Текст, карта Вселенной, хронология, справочник и поиск.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://vysockiymark01-prog.github.io/FallenAngels/og.png">
+<meta name="twitter:card" content="summary_large_image">
 </head>
 <body>
 <div class="topbar">
@@ -17,6 +24,7 @@
     <a href="index.html">Главная</a>
     <a href="read.html">Читать</a>
     <a href="map.html">Карта Вселенной</a>
+    <a href="timeline.html">Хронология</a>
     <a href="who.html">Кто есть кто</a>
     <a href="glossary.html">Словарь</a>
     <a href="search.html">Поиск</a>
@@ -29,7 +37,7 @@
 
 <div class="page">
   <h2 class="pagetitle">Поиск по тексту</h2>
-  <p class="pagesub">Ищет по всем 33 главам обеих частей. Введите слово или фразу — например, «золотое сечение», «Икар», «карма».</p>
+  <p class="pagesub">Ищет по всем 33 главам с учётом русских окончаний: «золотое сечение» найдёт и «золотым сечением». Несколько слов ищутся вместе в одном абзаце.</p>
   <div class="searchbox">
     <input id="q" type="search" placeholder="Что ищем?" autofocus>
     <button class="btn" id="go" style="padding:12px 20px;font-size:14px">Найти</button>
@@ -40,7 +48,8 @@
 
 <footer class="site">
   <div class="flinks">
-    <a href="index.html">Главная</a><a href="read.html">Читать</a><a href="map.html">Карта Вселенной</a><a href="who.html">Кто есть кто</a><a href="glossary.html">Словарь</a><a href="about.html">О проекте</a>
+    <a href="index.html">Главная</a><a href="read.html">Читать</a><a href="map.html">Карта Вселенной</a>
+    <a href="timeline.html">Хронология</a><a href="who.html">Кто есть кто</a><a href="glossary.html">Словарь</a><a href="about.html">О проекте</a>
   </div>
   <p>Материал носит эзотерико-мифологический характер и публикуется в ознакомительных целях.</p>
 </footer>
@@ -70,24 +79,49 @@
   function esc(s){ return s.replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
   function escRe(s){ return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
 
+  /* грубый стемминг: отрезаем типичные русские окончания, чтобы
+     «сечение» находило «сечению», «сечением» и т.д. */
+  var ENDINGS=['иями','ями','ами','иях','иям','ием','ией','ого','его','ому','ему','ыми','ими','ует','уют','ают','яют','ешь','ишь','ите','ете','ала','яла','ила','ело','ать','ять','ить','еть','ах','ях','ая','яя','ое','ее','ые','ие','ой','ей','ый','ий','ом','ем','ым','им','ов','ев','ам','ям','ую','юю','ья','ье','ьи','ся','сь','а','я','о','е','ы','и','у','ю','ь'].sort(function(a,b){return b.length-a.length;});
+  function stem(w){
+    w=w.toLowerCase().replace(/ё/g,'е');
+    for(var i=0;i<ENDINGS.length;i++){
+      var e=ENDINGS[i];
+      if(w.length-e.length>=3 && w.slice(-e.length)===e) return w.slice(0,w.length-e.length);
+    }
+    return w;
+  }
+  function stemRe(w){
+    var p=escRe(stem(w)).replace(/е/g,'[её]');
+    return new RegExp('(?:^|[^а-яёa-z0-9])('+p+'[а-яё]*)','gi');
+  }
+
   function run(){
     if(!chapters) return;
     var term=q.value.trim();
     results.innerHTML='';
     if(term.length<2){ meta.textContent='Введите хотя бы два символа.'; return; }
-    var re=new RegExp(escRe(term),'gi');
+    var words=term.split(/\s+/).filter(function(w){return w.length>=2;});
+    if(!words.length){ meta.textContent='Введите хотя бы два символа.'; return; }
+    var regs=words.map(stemRe);
     var total=0, chHits=0, html='';
     chapters.forEach(function(ch){
       var snips=[], count=0;
       ch.paras.forEach(function(p){
-        var m=p.match(re);
-        if(m){
-          count+=m.length;
+        /* абзац подходит, если в нём встречаются все слова запроса (в любой форме) */
+        var all=regs.every(function(re){ re.lastIndex=0; return re.test(p); });
+        if(all){
+          regs[0].lastIndex=0;
+          var m, n=0, firstIdx=-1;
+          while((m=regs[0].exec(p))!==null){ n++; if(firstIdx<0) firstIdx=m.index; }
+          count+=n;
           if(snips.length<3){
-            var idx=p.search(re);
-            var start=Math.max(0,idx-90), end=Math.min(p.length,idx+term.length+150);
+            var start=Math.max(0,firstIdx-90), end=Math.min(p.length,firstIdx+term.length+160);
             var snippet=(start>0?'…':'')+p.slice(start,end)+(end<p.length?'…':'');
-            snips.push(esc(snippet).replace(new RegExp(escRe(esc(term)),'gi'),function(x){return '<mark>'+x+'</mark>';}));
+            var out=esc(snippet);
+            regs.forEach(function(re){
+              out=out.replace(new RegExp(re.source,'gi'),function(x,g){ return x.replace(g,'<mark>'+g+'</mark>'); });
+            });
+            snips.push(out);
           }
         }
       });

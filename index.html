@@ -9,6 +9,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta property="og:site_name" content="Падшие ангелы">
+<meta property="og:title" content="Падшие ангелы — история нашей Вселенной">
+<meta property="og:description" content="Великий переход, Первостроители, звёздные войны, хроники Аненербе и тайна кибер-системы. Текст, карта Вселенной, хронология, справочник и поиск.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://vysockiymark01-prog.github.io/FallenAngels/og.png">
+<meta name="twitter:card" content="summary_large_image">
 </head>
 <body>
 <div class="topbar">
@@ -17,6 +24,7 @@
     <a href="index.html">Главная</a>
     <a href="read.html">Читать</a>
     <a href="map.html">Карта Вселенной</a>
+    <a href="timeline.html">Хронология</a>
     <a href="who.html">Кто есть кто</a>
     <a href="glossary.html">Словарь</a>
     <a href="search.html">Поиск</a>
@@ -33,7 +41,8 @@
   <p class="sub">История нашей Вселенной: Великий переход, Первостроители, звёздные войны, хроники Аненербе и тайна кибер-системы</p>
   <div class="wing">✦ ✦ ✦</div>
   <div class="cta">
-    <a class="btn primary" href="read.html#gl-1">Начать чтение</a>
+    <a class="btn primary" id="startBtn" href="read.html#gl-1">Начать чтение</a>
+    <a class="btn primary" id="continueBtn" href="read.html" style="display:none"></a>
     <a class="btn ghost" href="map.html">Карта Вселенной</a>
   </div>
 </header>
@@ -69,6 +78,7 @@
   <div class="section-label">Разделы</div>
   <div class="grid c3">
     <a class="card linkcard" href="map.html"><h4>🗺 Карта Вселенной</h4><p>Интерактивная схема: от прежней Вселенной 11-мерности до Солнечной системы.</p><span class="arrow">Открыть →</span></a>
+    <a class="card linkcard" href="timeline.html"><h4>⏳ Хронология</h4><p>Лента времени: все события истории — от 22 триллионов лет назад до наших дней.</p><span class="arrow">Открыть →</span></a>
     <a class="card linkcard" href="who.html"><h4>👥 Кто есть кто</h4><p>Справочник рас, цивилизаций, богов и действующих лиц.</p><span class="arrow">Открыть →</span></a>
     <a class="card linkcard" href="glossary.html"><h4>📖 Словарь</h4><p>Толкование ключевых терминов: от Пи-системы до сенс-энергии.</p><span class="arrow">Открыть →</span></a>
     <a class="card linkcard" href="search.html"><h4>🔍 Поиск</h4><p>Полнотекстовый поиск по всем 33 главам.</p><span class="arrow">Открыть →</span></a>
@@ -85,7 +95,8 @@
 
 <footer class="site">
   <div class="flinks">
-    <a href="read.html">Читать</a><a href="map.html">Карта Вселенной</a><a href="who.html">Кто есть кто</a><a href="glossary.html">Словарь</a><a href="search.html">Поиск</a><a href="about.html">О проекте</a>
+    <a href="read.html">Читать</a><a href="map.html">Карта Вселенной</a>
+    <a href="timeline.html">Хронология</a><a href="who.html">Кто есть кто</a><a href="glossary.html">Словарь</a><a href="search.html">Поиск</a><a href="about.html">О проекте</a>
   </div>
   <p>«Падшие ангелы» — текст подготовлен по материалам видеопубликаций:
   <a href="https://www.youtube.com/watch?v=BHsfPyFr4HE" target="_blank" rel="noopener">часть 1</a> ·
@@ -124,6 +135,22 @@
   var n=read.filter(function(x){return /^gl-\d+$/.test(x);}).length;
   document.getElementById('readfill').style.width=(n/33*100)+'%';
   document.getElementById('readinfo').textContent='Прочитано '+n+' из 33 глав'+(n===33?' — весь текст пройден ✦':'');
+
+  /* кнопка «Продолжить чтение» */
+  var last=null;
+  try{ last=localStorage.getItem('fa_last'); }catch(e){}
+  if(last && /^gl-\d+$/.test(last)){
+    var num=+last.replace('gl-','');
+    if(num>1){
+      var cb=document.getElementById('continueBtn');
+      cb.href='read.html#'+last;
+      cb.textContent='Продолжить чтение — глава '+num;
+      cb.style.display='';
+      var sb=document.getElementById('startBtn');
+      sb.className='btn ghost';
+      sb.textContent='С начала';
+    }
+  }
 })();
 </script>
 </body>

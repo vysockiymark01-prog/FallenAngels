@@ -3,8 +3,11 @@
   var root=document.documentElement, body=document.body;
   var LS=function(k,v){ try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v);}catch(e){return null;} };
 
-  /* тема */
-  var theme=LS('fa_theme')||'dark';
+  /* тема: сохранённая, иначе — системная */
+  var theme=LS('fa_theme');
+  if(!theme){
+    theme=(window.matchMedia && matchMedia('(prefers-color-scheme: light)').matches)?'light':'dark';
+  }
   root.setAttribute('data-theme',theme);
   var themeBtn=document.getElementById('themeBtn');
   if(themeBtn){
