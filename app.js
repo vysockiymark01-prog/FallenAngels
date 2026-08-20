@@ -43,6 +43,33 @@
     if(a.getAttribute('href')===here) a.classList.add('current');
   });
 
+  /* мобильное меню разделов (гамбургер в шапке) */
+  var navToggle=document.getElementById('navToggle');
+  var topnav=document.querySelector('.topnav');
+  if(navToggle && topnav){
+    var closeNav=function(){
+      topnav.classList.remove('open');
+      navToggle.setAttribute('aria-expanded','false');
+      navToggle.textContent='☰';
+    };
+    var openNav=function(){
+      topnav.classList.add('open');
+      navToggle.setAttribute('aria-expanded','true');
+      navToggle.textContent='✕';
+    };
+    navToggle.setAttribute('aria-expanded','false');
+    navToggle.onclick=function(e){
+      e.stopPropagation();
+      if(topnav.classList.contains('open')) closeNav(); else openNav();
+    };
+    topnav.querySelectorAll('a').forEach(function(a){ a.addEventListener('click',closeNav); });
+    document.addEventListener('click',function(e){
+      if(topnav.classList.contains('open') && !topnav.contains(e.target) && e.target!==navToggle) closeNav();
+    });
+    document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeNav(); });
+    window.addEventListener('resize',function(){ if(window.innerWidth>900) closeNav(); });
+  }
+
   /* API отметок прочтения */
   window.FA={
     total:33,
