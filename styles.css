@@ -9,9 +9,12 @@ html[data-theme="light"]{
   --good:#3d8b52; --bad:#b04a4a;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--text);font-family:'PT Serif',Georgia,serif;font-size:var(--fs,19px);line-height:1.75;transition:background .3s,color .3s}
+html{scroll-behavior:smooth;overscroll-behavior-y:contain}
+body{background:var(--bg);color:var(--text);font-family:'PT Serif',Georgia,serif;font-size:var(--fs,19px);line-height:1.75;transition:background .3s,color .3s;overscroll-behavior-y:contain}
+body.nav-open{overflow:hidden}
 a{color:var(--accent)}
+.nav-backdrop{position:fixed;inset:0;z-index:88;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .2s}
+.nav-backdrop.show{opacity:1;pointer-events:auto}
 .progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0;z-index:100}
 
 /* ---------- top navigation ---------- */

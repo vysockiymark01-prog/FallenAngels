@@ -47,13 +47,20 @@
   var navToggle=document.getElementById('navToggle');
   var topnav=document.querySelector('.topnav');
   if(navToggle && topnav){
+    var navBackdrop=document.createElement('div');
+    navBackdrop.className='nav-backdrop';
+    document.body.appendChild(navBackdrop);
     var closeNav=function(){
       topnav.classList.remove('open');
+      navBackdrop.classList.remove('show');
+      body.classList.remove('nav-open');
       navToggle.setAttribute('aria-expanded','false');
       navToggle.textContent='☰';
     };
     var openNav=function(){
       topnav.classList.add('open');
+      navBackdrop.classList.add('show');
+      body.classList.add('nav-open');
       navToggle.setAttribute('aria-expanded','true');
       navToggle.textContent='✕';
     };
@@ -63,6 +70,7 @@
       if(topnav.classList.contains('open')) closeNav(); else openNav();
     };
     topnav.querySelectorAll('a').forEach(function(a){ a.addEventListener('click',closeNav); });
+    navBackdrop.addEventListener('click',closeNav);
     document.addEventListener('click',function(e){
       if(topnav.classList.contains('open') && !topnav.contains(e.target) && e.target!==navToggle) closeNav();
     });
