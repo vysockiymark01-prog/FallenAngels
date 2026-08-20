@@ -50,17 +50,21 @@
     var navBackdrop=document.createElement('div');
     navBackdrop.className='nav-backdrop';
     document.body.appendChild(navBackdrop);
+    /* блокируем скролл фона через touchmove, а не overflow:hidden —
+       переключение overflow на <body> на Android Chrome иногда оставляет
+       визуальные артефакты на соседних элементах (sticky/blur) */
+    var lockTouch=function(e){ if(!topnav.contains(e.target)) e.preventDefault(); };
     var closeNav=function(){
       topnav.classList.remove('open');
       navBackdrop.classList.remove('show');
-      body.classList.remove('nav-open');
+      document.removeEventListener('touchmove',lockTouch);
       navToggle.setAttribute('aria-expanded','false');
       navToggle.textContent='☰';
     };
     var openNav=function(){
       topnav.classList.add('open');
       navBackdrop.classList.add('show');
-      body.classList.add('nav-open');
+      document.addEventListener('touchmove',lockTouch,{passive:false});
       navToggle.setAttribute('aria-expanded','true');
       navToggle.textContent='✕';
     };
