@@ -1,4 +1,4 @@
-const CACHE = 'fa-cache-v1';
+const CACHE = 'fa-cache-v2';
 const ASSETS = [
   './',
   'index.html',
@@ -49,7 +49,14 @@ self.addEventListener('fetch', function(e){
           caches.open(CACHE).then(function(cache){ cache.put(e.request, copy); });
         }
         return res;
-      }).catch(function(){ return cached; });
+      }).catch(function(){
+        // офлайн, и в кэше для этого конкретного запроса пусто —
+        // для перехода между страницами отдаём хотя бы главную,
+        // чтобы вместо "нет сети" открылось что-то рабочее
+        if (cached) return cached;
+        if (e.request.mode === 'navigate') return caches.match('index.html');
+        return Response.error();
+      });
       return cached || fetchPromise;
     })
   );
